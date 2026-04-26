@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lice Belle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #F7F3EE;
+      --warm-white: #FDFAF7;
+      --rose: #C9908A;
+      --rose-light: #E8C5C1;
+      --rose-dim: rgba(201,144,138,0.12);
+      --gold: #B8965A;
+      --gold-dim: rgba(184,150,90,0.15);
+      --dark: #1A1510;
+      --brown: #3D2E22;
+      --text: #2C2018;
+      --text-muted: #7A6558;
+      --text-dim: #B5A99F;
+      --border: rgba(180,150,130,0.18);
+      --border-hover: rgba(180,150,130,0.35);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--warm-white);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 8px; height: 8px;
+      background: var(--rose);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s;
+    }
+
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 0.5px solid var(--rose);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s, transform 0.15s;
+      opacity: 0.5;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 24px 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.4s, padding 0.4s, border-color 0.4s;
+      border-bottom: 0.5px solid transparent;
+    }
+
+    nav.scrolled {
+      background: rgba(253,250,247,0.94);
+      backdrop-filter: blur(16px);
+      padding: 16px 56px;
+      border-color: var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      color: var(--text);
+      text-decoration: none;
+      cursor: none;
+    }
+
+    .nav-logo em { font-style: italic; color: var(--rose);}
+
+    .nav-links { display: flex; gap: 36px; list-style: none;}
+
+    .nav-links a {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      cursor: none;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rose) !important;
+      border-bottom: 0.5px solid var(--rose-light);
+      padding-bottom: 1px;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 120px 56px 80px;
+      gap: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative background circles */
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,144,138,0.08) 0%, transparent 70%);
+      right: -100px; top: -100px;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(184,150,90,0.06) 0%, transparent 70%);
+      left: 100px; bottom: 100px;
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.2s forwards;
+    }
+
+    .hero-label::before {
+      content: '';
+      display: block;
+      width: 32px; height: 0.5px;
+      background: var(--gold);
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(52px, 6vw, 82px);
+      font-weight: 300;
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.35s forwards;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--rose);
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 380px;
+      line-height: 1.8;
+      margin-bottom: 44px;
+      font-weight: 300;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.65s forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--rose);
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 0;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: background 0.25s, transform 0.25s;
+      cursor: none;
+    }
+
+    .btn-primary:hover { background: #b8827c; transform: translateY(-1px); }
+
+    .btn-ghost {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-bottom: 0.5px solid var(--border-hover);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+      cursor: none;
+    }
+
+    .btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
+
+    /* Hero visual */
+    .hero-visual {
+      position: relative;
+      height: 560px;
+      opacity: 0;
+      animation: fadeIn 1s ease 0.4s forwards;
+    }
+
+    .hero-img-frame {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--rose-light) 0%, #D4A8A4 40%, #C49090 100%);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Decorative pattern inside frame */
+    .hero-img-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 70%, rgba(180,130,120,0.3) 0%, transparent 50%);
+    }
+
+    .hero-img-ornament {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 180px;
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(255,255,255,0.15);
+      line-height: 1;
+      user-select: none;
+    }
+
+    .hero-badge {
+      position: absolute;
+      bottom: -20px;
+      left: -20px;
+      background: var(--warm-white);
+      border: 0.5px solid var(--border);
+      padding: 20px 24px;
+      border-radius: 2px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+    }
+
+    .hero-badge-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 300;
+      color: var(--rose);
+      line-height: 1;
+    }
+
+    .hero-badge-text {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .hero-line {
+      position: absolute;
+      top: 40px; right: -20px;
+      width: 0.5px;
+      height: 120px;
+      background: linear-gradient(to bottom, transparent, var(--rose-light), transparent);
+    }
+
+    /* SECTION BASE */
+    .section {
+      padding: 100px 56px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow-line {
+      width: 32px; height: 0.5px;
+      background: var(--gold);
+    }
+
+    .eyebrow-text {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 4vw, 52px);
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .section-title em { font-style: italic; color: var(--rose); }
+
+    .section-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 300;
+      max-width: 460px;
+      line-height: 1.8;
+      margin-bottom: 56px;
+    }
+
+    /* SERVICES */
+    .services-bg {
+      background: var(--cream);
+      padding: 100px 0;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+    }
+
+    .service-card {
+      background: var(--warm-white);
+      padding: 44px 36px;
+      transition: background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--rose), var(--gold));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-card:hover { background: var(--cream); }
+
+    .service-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 48px;
+      font-weight: 300;
+      color: var(--rose-light);
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .service-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .service-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .service-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-weight: 300;
+      margin-bottom: 20px;
+    }
+
+    .service-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      color: var(--gold);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+    }
+
+    /* TESTIMONIALS */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .testimonial-card {
+      background: var(--cream);
+      border: 0.5px solid var(--border);
+      padding: 36px;
+      border-radius: 2px;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.06);
+    }
+
+    .testimonial-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 64px;
+      color: var(--rose-light);
+      line-height: 0.6;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .testimonial-text {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      font-weight: 300;
+      font-style: italic;
+      margin-bottom: 28px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .author-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: 0.04em;
+    }
+
+    .author-service {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .stars {
+      color: var(--gold);
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    /* DIVIDER */
+    .ornament-divider {
+      text-align: center;
+      padding: 48px 0;
+      color: var(--rose-light);
+      font-size: 24px;
+      letter-spacing: 12px;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,0.5);
+      padding: 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--warm-white);
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .footer-logo em { color: var(--rose-light); font-style: italic; }
+
+    .footer-tagline {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .footer-heading {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .footer-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+    .footer-list a {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      transition: color 0.2s;
+      font-weight: 300;
+    }
+
+    .footer-list a:hover { color: rgba(255,255,255,0.8); }
+
+    .footer-bottom {
+      background: var(--dark);
+      border-top: 0.5px solid rgba(255,255,255,0.06);
+      padding: 20px 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-bottom p {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.2);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      nav.scrolled { padding: 12px 24px; }
+      .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 40px; }
+      .hero-visual { height: 320px; }
+      .section { padding: 72px 24px; }
+      .services-bg { padding: 72px 0; }
+      .services-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      footer { grid-template-columns: 1fr; padding: 40px 24px; }
+      .footer-bottom { padding: 16px 24px; flex-direction: column; gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">Maison <em>Belle</em></a>
+    <ul class="nav-links">
+      <li><a href="#servicos">Serviços</a></li>
+      <li><a href="#depoimentos">Depoimentos</a></li>
+      <li><a href="#contato" class="nav-cta">Agendar</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-label">Salão de Beleza · Recife, PE</div>
+      <h1 class="hero-title">
+        Arte em<br>
+        cada <em>detalhe</em>
+      </h1>
+      <p class="hero-desc">
+        Transformamos sua beleza com técnica, cuidado e a sofisticação que você merece. Bem-vinda ao seu novo espaço de autocuidado.
+      </p>
+      <div class="hero-actions">
+        <a href="#servicos" class="btn-primary">Ver serviços →</a>
+        <a href="#depoimentos" class="btn-ghost">Depoimentos</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-img-frame">
+        <div class="hero-img-ornament">B</div>
+      </div>
+      <div class="hero-badge">
+        <div class="hero-badge-num">+200</div>
+        <div class="hero-badge-text">Clientes satisfeitas</div>
+      </div>
+      <div class="hero-line"></div>
+    </div>
+  </section>
+
+  <div class="ornament-divider">✦ ✦ ✦</div>
+
+  <!-- SERVICES -->
+  <div class="services-bg" id="servicos">
+    <div class="section">
+      <div class="section-eyebrow reveal">
+        <div class="eyebrow-line"></div>
+        <span class="eyebrow-text">O que oferecemos</span>
+      </div>
+      <h2 class="section-title reveal">Nossos <em>Serviços</em></h2>
+      <p class="section-sub reveal">Cada serviço pensado para realçar sua beleza única com produtos de alta qualidade.</p>
+
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <span class="service-icon">✂️</span>
+          <div class="service-num">01</div>
+          <div class="service-name">Corte & Styling</div>
+          <p class="service-desc">Cortes modernos e clássicos adaptados ao seu rosto e personalidade, com técnicas exclusivas.</p>
+          <div class="service-price">A partir de R$ 80</div>
+        </div>
+
+        <div class="service-card reveal reveal-delay-1">
+          <span class="service-icon">🎨</span>
+          <div class="service-num">02</div>
+          <div class="service-name">Coloração</div>
+          <p class="service-desc">Mechas, balayage, coloração global e técnicas de cor exclusivas com produtos premium.</p>
+          <div class="service-price">A partir de R$ 150</div>
+        </div>
+
+        <div class="service-card reveal reveal-delay-2">
+          <span class="service-icon">✨</span>
+          <div class="service-num">03</div>
+          <div class="service-name">Tratamentos</div>
+          <p class="service-desc">Hidratação profunda, reconstrução, botox capilar e cronograma capilar personalizado.</p>
+          <div class="service-price">A partir de R$ 120</div>
+        </div>
+
+        <div class="service-card reveal reveal-delay-1">
+          <span class="service-icon">💅</span>
+          <div class="service-num">04</div>
+          <div class="service-name">Manicure & Pedicure</div>
+          <p class="service-desc">Cuidado completo para suas unhas com esmaltes das melhores marcas e técnicas nail art.</p>
+          <div class="service-price">A partir de R$ 45</div>
+        </div>
+
+        <div class="service-card reveal reveal-delay-2">
+          <span class="service-icon">💆</span>
+          <div class="service-num">05</div>
+          <div class="service-name">Maquiagem</div>
+          <p class="service-desc">Make para festas, casamentos e eventos especiais. Look social e artístico sob medida.</p>
+          <div class="service-price">A partir de R$ 180</div>
+        </div>
+
+        <div class="service-card reveal reveal-delay-3">
+          <span class="service-icon">🌸</span>
+          <div class="service-num">06</div>
+          <div class="service-name">Pacote Noiva</div>
+          <p class="service-desc">Dia da noiva completo com equipe exclusiva, teste prévio e atendimento personalizado.</p>
+          <div class="service-price">Sob consulta</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ornament-divider">✦ ✦ ✦</div>
+
+  <!-- TESTIMONIALS -->
+  <div id="depoimentos">
+    <div class="section">
+      <div class="section-eyebrow reveal">
+        <div class="eyebrow-line"></div>
+        <span class="eyebrow-text">O que dizem</span>
+      </div>
+      <h2 class="section-title reveal">Quem <em>viveu</em> sabe</h2>
+      <p class="section-sub reveal">A satisfação das nossas clientes é o nosso maior reconhecimento.</p>
+
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal">
+          <span class="testimonial-quote">"</span>
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">O balayage ficou simplesmente perfeito. Nunca me senti tão bonita. O atendimento é único, cada detalhe é pensado com muito carinho.</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #C9908A, #B8965A)">A</div>
+            <div>
+              <div class="author-name">Ana Carolina</div>
+              <div class="author-service">Coloração · Balayage</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal reveal-delay-1">
+          <span class="testimonial-quote">"</span>
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">Fui para o meu casamento arrasando! A equipe da Maison Belle é incrível, super profissional. Meu dia ficou ainda mais especial.</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #9A7BB5, #C9908A)">M</div>
+            <div>
+              <div class="author-name">Mariana Souza</div>
+              <div class="author-service">Pacote Noiva</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal reveal-delay-2">
+          <span class="testimonial-quote">"</span>
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">O tratamento de hidratação salvou o meu cabelo. Saí de lá com fios completamente renovados. Já sou cliente fiel há dois anos.</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: linear-gradient(135deg, #B8965A, #C49090)">J</div>
+            <div>
+              <div class="author-name">Juliana Ferreira</div>
+              <div class="author-service">Tratamento Capilar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer id="contato">
+    <div>
+      <div class="footer-logo">Maison <em>Belle</em></div>
+      <div class="footer-tagline">Arte em cada detalhe</div>
+    </div>
+    <div>
+      <div class="footer-heading">Contato</div>
+      <ul class="footer-list">
+        <li><a href="#">(81) 99999-0000</a></li>
+        <li><a href="#">contato@maisonbelle.com.br</a></li>
+        <li><a href="#">Boa Viagem, Recife — PE</a></li>
+        <li><a href="#">Seg–Sáb: 9h às 19h</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Redes Sociais</div>
+      <ul class="footer-list">
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">WhatsApp</a></li>
+        <li><a href="#">Facebook</a></li>
+      </ul>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <p>© 2026 Maison Belle · Todos os direitos reservados</p>
+    <p>Desenvolvido por L. Azevedo</p>
+  </div>
+
+  <script>
+    // Nav scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        ring.style.width = '56px';
+        ring.style.height = '56px';
+        ring.style.opacity = '0.3';
+      });
+      el.addEventListener('mouseleave', () => {
+        ring.style.width = '36px';
+        ring.style.height = '36px';
+        ring.style.opacity = '0.5';
+      });
+    });
+  </script>
+
+</body>
+</html>
